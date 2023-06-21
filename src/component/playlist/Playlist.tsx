@@ -2,7 +2,11 @@ import React from 'react';
 import {HorizonalRow, MainContiner, PlaylistNameText} from './styled';
 import SVGIcon from '../../assets/svg/index';
 
-const Playlist: React.FC = ({playlistName}) => {
+interface PlaylistProps {
+  playlistName: string;
+}
+
+const Playlist: React.FC<PlaylistProps> = ({playlistName}) => {
   return (
     <MainContiner>
       <HorizonalRow>

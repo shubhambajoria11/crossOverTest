@@ -1,4 +1,4 @@
-import {Dimensions, PixelRatio} from 'react-native';
+import {Dimensions, PixelRatio, StyleSheet} from 'react-native';
 
 // default reference dimensions (iPad)
 
@@ -65,3 +65,9 @@ export enum keyboardType {
   numeric = 'numeric',
   email = 'email-address',
 }
+
+export const GlobalStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

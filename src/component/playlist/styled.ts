@@ -9,7 +9,8 @@ export const MainContiner = styled.View`
   align-items: center;
   flex-direction: row;
   height: ${rh(36)}px;
-  padding-horizontal: ${rw(12)}px;
+  padding-left: ${rw(12)}px;
+  padding-right: ${rw(12)}px;
   justify-content: space-between;
 `;
 export const HorizonalRow = styled.View`

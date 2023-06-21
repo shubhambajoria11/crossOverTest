@@ -141,17 +141,30 @@ export const HowWellDidYouKnowThis = styled.Text`
 export const ContentContainer = styled.View`
   border-width: ${rpx(3)}px;
   border-color: ${colors.apple};
-  height: ${abc - rh(180)}px;
+  height: ${abc - rh(155)}px;
   justify-content: space-between;
   justify-content: center;
   /* background-color: ${colors.darkBlack}; */
 `;
 
 export const ContentTopContainer = styled.View`
-  /* border-width: ${rpx(3)}px;
-  border-color: ${colors.blue}; */
+  border-width: ${rpx(3)}px;
+  border-color: ${colors.blue};
 `;
 export const ContentBottomContainer = styled.View`
+  flex: 1;
   /* border-width: ${rpx(3)}px;
   border-color: ${colors.white}; */
 `;
+
+export const ContentContainerForYou = styled.View`
+  border-width: ${rpx(3)}px;
+  border-color: ${colors.apple};
+  height: ${abc - rh(155)}px;
+  justify-content: space-between;
+  justify-content: center;
+
+  /* background-color: ${colors.darkBlack}; */
+`;
+
+export const OptionContainer = styled.View``;

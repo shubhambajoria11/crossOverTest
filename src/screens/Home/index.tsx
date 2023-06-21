@@ -12,6 +12,7 @@ import {
   ClickableContainer,
   ContentBottomContainer,
   ContentContainer,
+  ContentContainerForYou,
   ContentTopContainer,
   FollowingText,
   FollowText,
@@ -30,94 +31,95 @@ import {
 } from './styled';
 import SVGIcon from '../../assets/svg/index';
 import useCountTimer from '../../component/timerHook/useCountTimer';
-import {Alert, FlatList, View, Text, Dimensions} from 'react-native';
+import {Alert, FlatList} from 'react-native';
+import Options from '../../component/Options/Options';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootTabParamList} from '../../navigation/tabBarNavigation/TabBarNavigator';
+import {IFollowing, IForYou} from '../types/types';
+import {API_END_POINTS, BASE_URL} from '../../constants/server';
+import {
+  FOLLOWING,
+  FOR_YOU,
+  SOMETHING_WENT_WRONG,
+} from '../../constants/strings';
 
-const Home: React.FC = () => {
-  const [followingEachData, setFollowingEachData] = useState<string[]>([]);
-  const [forYouEachData, setForYouEachData] = useState<string[]>([]);
+export type NavigationHomeProps = NativeStackScreenProps<
+  RootTabParamList,
+  'Home'
+>;
 
-  const [question, setQuestion] = useState();
-  const [playlistName, setPlaylistName] = useState();
-  const [author, setAuthor] = useState();
-  const [description, setDescription] = useState();
-  const [answer, setAnswer] = useState();
-  const [activeFlashCard, setActiveFlashCard] = useState('Following');
+interface HomeProps extends NavigationHomeProps {
+  // followingEachData: IFollowing[];
+  // forYouEachData: IForYou[];
+}
+
+const Home: React.FC<HomeProps> = () => {
+  const [followingEachData, setFollowingEachData] = useState<IFollowing[]>([]);
+  const [forYouEachData, setForYouEachData] = useState<IForYou[]>([]);
+
+  const [activeFlashCard, setActiveFlashCard] = useState<string>(FOLLOWING);
 
   const [activeClickForShowAnswer, setActiveClickForShowAnswer] =
-    useState(false);
+    useState<boolean>(false);
 
   const [min, secs] = useCountTimer(1, true);
 
   const getFollowingQuestionsData = () => {
-    api('https://cross-platform.rp.devfactory.com/following', {
+    api(BASE_URL + API_END_POINTS.following, {
       method: REQUEST_METHODS.GET,
     })
-      .then(res => {
-        setFollowingEachData(prevData => [...prevData, res?.data]);
-        console.log('following', res?.data?.flashcard_back);
-        setQuestion(res?.data?.flashcard_front);
-        setPlaylistName(res?.data?.playlist);
-        setAuthor(res?.data?.user?.name);
-        setDescription(res?.data?.description);
-        setAnswer(res?.data?.flashcard_back);
+      .then((res: any) => {
+        setFollowingEachData((prevData: IFollowing[]) => [
+          ...prevData,
+          res?.data,
+        ]);
       })
       .catch(() => {
-        Alert.alert('Something went wrong. Please try again !!');
+        Alert.alert(SOMETHING_WENT_WRONG);
       });
   };
 
   const getForYouQuestionsData = () => {
-    api('https://cross-platform.rp.devfactory.com/for_you', {
+    api(BASE_URL + API_END_POINTS.forYou, {
       method: REQUEST_METHODS.GET,
     })
-      .then(res => {
-        console.log('for you', res?.data);
-        // setForYouEachData(pre => [...pre, res?.data]);
+      .then((res: any) => {
+        setForYouEachData((prevData: IForYou[]) => [...prevData, res?.data]);
       })
       .catch(() => {
-        Alert.alert('Something went wrong. Please try again !!');
+        Alert.alert(SOMETHING_WENT_WRONG);
       });
   };
 
   useEffect(() => {
-    if (activeFlashCard === 'For You') {
+    if (activeFlashCard === FOR_YOU) {
       getForYouQuestionsData();
     } else {
       getFollowingQuestionsData();
     }
   }, [activeFlashCard]);
 
-  const renderItem = ({item}) => {
-    console.log('item', item);
-    return (
+  const renderItem = ({item}: {item: IFollowing | IForYou | any}) => {
+    return activeFlashCard === FOLLOWING ? (
       <ContentContainer>
         <ContentTopContainer>
-          {activeFlashCard === 'Following' ? (
-            <QuestionsAnswersContainer
-              onPress={() => {
-                setActiveClickForShowAnswer(!activeClickForShowAnswer);
-              }}>
-              <QuestionText>{item.flashcard_front}</QuestionText>
-              {activeClickForShowAnswer && <HorizontalLine />}
-              {activeClickForShowAnswer && <AnswerText>Answer</AnswerText>}
-              {activeClickForShowAnswer && (
-                <Answer>{item.flashcard_back}</Answer>
-              )}
-              {activeClickForShowAnswer && (
-                <HowWellDidYouKnowThis>
-                  How Well Did You Know This
-                </HowWellDidYouKnowThis>
-              )}
-              {activeClickForShowAnswer && <HorizontalBoxes />}
-            </QuestionsAnswersContainer>
-          ) : (
-            <QuestionsAnswersContainer>
-              <QuestionText>For you question</QuestionText>
-            </QuestionsAnswersContainer>
-          )}
-
+          <QuestionsAnswersContainer
+            onPress={() => {
+              setActiveClickForShowAnswer(!activeClickForShowAnswer);
+            }}>
+            <QuestionText>{item.flashcard_front}</QuestionText>
+            {activeClickForShowAnswer && <HorizontalLine />}
+            {activeClickForShowAnswer && <AnswerText>Answer</AnswerText>}
+            {activeClickForShowAnswer && <Answer>{item.flashcard_back}</Answer>}
+            {activeClickForShowAnswer && (
+              <HowWellDidYouKnowThis>
+                How Well Did You Know This
+              </HowWellDidYouKnowThis>
+            )}
+            {activeClickForShowAnswer && <HorizontalBoxes />}
+          </QuestionsAnswersContainer>
           <AuthorContainer>
-            <Author author={author} description={description} />
+            <Author author={item.user?.name} description={item.description} />
           </AuthorContainer>
           <VerticalCardContainer>
             <VerticalCard />
@@ -125,49 +127,32 @@ const Home: React.FC = () => {
         </ContentTopContainer>
         <ContentBottomContainer>
           <PlaylistContainer>
-            <Playlist playlistName={playlistName} />
+            <Playlist playlistName={item.playlist} />
           </PlaylistContainer>
         </ContentBottomContainer>
       </ContentContainer>
+    ) : (
+      <ContentContainerForYou>
+        <ContentTopContainer>
+          <QuestionsAnswersContainer>
+            <QuestionText>{item.question}</QuestionText>
+            <Options option={item.options} />
+          </QuestionsAnswersContainer>
+          <AuthorContainer>
+            <Author author={item.user?.name} description={item.description} />
+          </AuthorContainer>
+          <VerticalCardContainer>
+            <VerticalCard />
+          </VerticalCardContainer>
+        </ContentTopContainer>
+        <ContentBottomContainer>
+          <PlaylistContainer>
+            <Playlist playlistName={item.playlist} />
+          </PlaylistContainer>
+        </ContentBottomContainer>
+      </ContentContainerForYou>
     );
   };
-
-  // const renderItem = ({item}) => {
-  //   return (
-  // <View style={{flex: 1, borderWidth: 1, borderColor: 'red'}}>
-  //   {activeFlashCard === 'Following' ? (
-  //     <QuestionsAnswersContainer
-  //       onPress={() => {
-  //         setActiveClickForShowAnswer(!activeClickForShowAnswer);
-  //       }}>
-  //       <QuestionText>{item.flashcard_front}</QuestionText>
-  //       {activeClickForShowAnswer && <HorizontalLine />}
-  //       {activeClickForShowAnswer && <AnswerText>Answer</AnswerText>}
-  //       {activeClickForShowAnswer && <Answer>{answer}</Answer>}
-  //       {activeClickForShowAnswer && (
-  //         <HowWellDidYouKnowThis>
-  //           How Well Did You Know This
-  //         </HowWellDidYouKnowThis>
-  //       )}
-  //       {activeClickForShowAnswer && <HorizontalBoxes />}
-  //     </QuestionsAnswersContainer>
-  //   ) : (
-  //     <QuestionsAnswersContainer>
-  //       <QuestionText>For you question</QuestionText>
-  //     </QuestionsAnswersContainer>
-  //   )}
-  //   <VerticalCardContainer>
-  //     <VerticalCard />
-  //   </VerticalCardContainer>
-  //   <AuthorContainer>
-  //     <Author author={author} description={description} />
-  //   </AuthorContainer>
-  //   <PlaylistContainer>
-  //     <Playlist playlistName={playlistName} />
-  //   </PlaylistContainer>
-  // </View>
-  //   );
-  // };
 
   return (
     <MainContainer>
@@ -187,7 +172,7 @@ const Home: React.FC = () => {
           <ClickableContainer
             activeFlashCard={activeFlashCard}
             onPress={() => {
-              setActiveFlashCard('Following');
+              setActiveFlashCard(FOLLOWING);
             }}>
             <FollowingText activeFlashCard={activeFlashCard}>
               Following
@@ -196,7 +181,7 @@ const Home: React.FC = () => {
           <ClickableContainer
             activeFlashCard={activeFlashCard}
             onPress={() => {
-              setActiveFlashCard('For You');
+              setActiveFlashCard(FOR_YOU);
             }}>
             <FollowText activeFlashCard={activeFlashCard}>For You</FollowText>
           </ClickableContainer>
@@ -210,48 +195,23 @@ const Home: React.FC = () => {
           />
         </HeaderSearch>
       </HeaderContainer>
-      <FlatList
-        // data={[1]}
-        data={followingEachData}
-        style={{flexGrow: 1}}
-        keyExtractor={(item, index) => item.id + index}
-        renderItem={renderItem}
-        onEndReached={getFollowingQuestionsData}
-        onEndReachedThreshold={0.1}
-        // contentContainerStyle={{flex: 1}}
-      />
-
-      {/* {activeFlashCard === 'Following' ? (
-        <QuestionsAnswersContainer
-          onPress={() => {
-            setActiveClickForShowAnswer(!activeClickForShowAnswer);
-          }}>
-          <QuestionText>{question}</QuestionText>
-          {activeClickForShowAnswer && <HorizontalLine />}
-          {activeClickForShowAnswer && <AnswerText>Answer</AnswerText>}
-          {activeClickForShowAnswer && <Answer>{answer}</Answer>}
-          {activeClickForShowAnswer && (
-            <HowWellDidYouKnowThis>
-              How Well Did You Know This
-            </HowWellDidYouKnowThis>
-          )}
-          {activeClickForShowAnswer && <HorizontalBoxes />}
-        </QuestionsAnswersContainer>
+      {activeFlashCard === FOLLOWING ? (
+        <FlatList
+          data={followingEachData}
+          keyExtractor={(item, index) => item.id.toString() + index.toString()}
+          renderItem={renderItem}
+          onEndReached={getFollowingQuestionsData}
+          onEndReachedThreshold={0.1}
+        />
       ) : (
-        <QuestionsAnswersContainer>
-          <QuestionText></QuestionText>
-        </QuestionsAnswersContainer>
+        <FlatList
+          data={forYouEachData}
+          keyExtractor={(item, index) => item.id.toString() + index.toString()}
+          renderItem={renderItem}
+          onEndReached={getForYouQuestionsData}
+          onEndReachedThreshold={0.1}
+        />
       )}
-
-      <VerticalCardContainer>
-        <VerticalCard />
-      </VerticalCardContainer>
-      <AuthorContainer>
-        <Author author={author} description={description} />
-      </AuthorContainer>
-      <PlaylistContainer>
-        <Playlist playlistName={playlistName} />
-      </PlaylistContainer> */}
     </MainContainer>
   );
 };

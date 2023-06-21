@@ -9,9 +9,9 @@ import Profile from '../../screens/Profile';
 import CustomHeader from '../../component/customHeader/CustomHeader';
 import colors from '../../styles/colors';
 import SVGIcon from '../../assets/svg/index';
-import TopBarNavigator from '../topBarNavigation/TopBarNavigator';
 import {StatusBar} from 'react-native';
 import Home from '../../screens/Home';
+
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export type RootTabParamList = {
@@ -41,7 +41,6 @@ const TabBarNavigator: React.FC = () => {
         }}>
         <Tab.Screen
           name="Home"
-          // component={TopBarNavigator}
           component={Home}
           options={{
             // eslint-disable-next-line react/no-unstable-nested-components

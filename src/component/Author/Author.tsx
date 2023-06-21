@@ -1,7 +1,12 @@
 import React from 'react';
 import {AuthorText, MainContiner, TopicText} from './styled';
 
-const Author: React.FC = ({author, description}) => {
+interface AuthorProps {
+  author: string;
+  description: string;
+}
+
+const Author: React.FC<AuthorProps> = ({author, description}) => {
   return (
     <MainContiner>
       <AuthorText>{author}</AuthorText>

@@ -1,9 +1,13 @@
-import {View, Text} from 'react-native';
 import React from 'react';
 import {MainBox, MainContainer, NumberText} from './styled';
 import colors from '../../styles/colors';
 
-const SingleElement = ({color, number}) => {
+interface SingleElementProps {
+  color: string;
+  number: string;
+}
+
+const SingleElement: React.FC<SingleElementProps> = ({color, number}) => {
   return (
     <MainBox color={color}>
       <NumberText>{number}</NumberText>
