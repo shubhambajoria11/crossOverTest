@@ -7,7 +7,7 @@
  */
 
 import React, {useLayoutEffect} from 'react';
-import SplashScreen from 'react-native-splash-screen'; //import SplashScreen
+import SplashScreen from 'react-native-splash-screen';
 import {View} from 'react-native';
 import TabBarNavigator from './src/navigation/tabBarNavigation/TabBarNavigator';
 import {GlobalStyles} from './src/styles/Dimen';

@@ -1,13 +1,15 @@
 module.exports = {
-  presets: ['module:metro-react-native-babel-preset'],
-  plugins: [
-    [
-      'module-resolver',
-      {
-        root: ['./src'],
-        extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
-        alias: {tests: ['./tests/'], '@components': './src/components'},
-      },
-    ],
+  preset: 'react-native',
+  transformIgnorePatterns: [
+    'node_modules/(?!(jest-)?@?react-native|@react-native-community|@react-navigation|redux-persist-sensitive-storage)',
+    'node_modules/(?!(jest-)?react-native-permissions|)',
   ],
+  transform: {
+    '.+\\.(svg)$': 'jest-transform-stub',
+  },
+  moduleNameMapper: {
+    '\\./svg': './__mocks__/svgMock.js',
+  },
+  setupFiles: ['./jest/setup.ts'],
+  setupFilesAfterEnv: ['./jest/jestAfterEnvSetup.js'],
 };
